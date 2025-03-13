@@ -1,0 +1,71 @@
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mssql-server
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong!Password
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql-data:/var/opt/mssql
+    networks:
+      - company_network
+
+  webapi:
+    build: 
+      context: ./web-api
+    container_name: web-api
+    environment:
+      - DB_HOST=mssql-server
+      - DB_USER=sa
+      - DB_PASSWORD=YourStrong!Password
+    ports:
+      - "8080:8080"
+    networks:
+      - company_network
+    depends_on:
+      - mssql
+
+  modsec-nginx:
+    build:
+      context: ./modsec-nginx
+    container_name: modsec-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - company_network
+    depends_on:
+      - webapi
+
+  juice-shop:
+    image: bkimminich/juice-shop
+    container_name: juice-shop
+    hostname: juice.shop
+    ports:
+      - "3000:3000"
+    networks:
+      - company_network
+
+  fileserver:
+    image: nextcloud
+    container_name: file-server
+    environment:
+      - MYSQL_PASSWORD=YourStrong!Password
+      - MYSQL_USER=nextcloud
+      - MYSQL_DATABASE=nextcloud
+    volumes:
+      - nextcloud-data:/var/www/html
+    ports:
+      - "8081:80"
+    networks:
+      - company_network
+
+volumes:
+  mssql-data:
+  nextcloud-data:
+
+networks:
+  company_network:
+    driver: bridge
