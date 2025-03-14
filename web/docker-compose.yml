@@ -10,7 +10,7 @@ services:
     volumes:
       - mssql-data:/var/opt/mssql
     networks:
-      - company_network
+      - network_a
 
   webapi:
     build: 
@@ -23,7 +23,7 @@ services:
     ports:
       - "8080:8080"
     networks:
-      - company_network
+      - network_a
     depends_on:
       - mssql
 
@@ -35,7 +35,7 @@ services:
       - "80:80"
       - "443:443"
     networks:
-      - company_network
+      - network_a
     depends_on:
       - webapi
 
@@ -46,26 +46,12 @@ services:
     ports:
       - "3000:3000"
     networks:
-      - company_network
-
-  fileserver:
-    image: nextcloud
-    container_name: file-server
-    environment:
-      - MYSQL_PASSWORD=YourStrong!Password
-      - MYSQL_USER=nextcloud
-      - MYSQL_DATABASE=nextcloud
-    volumes:
-      - nextcloud-data:/var/www/html
-    ports:
-      - "8081:80"
-    networks:
-      - company_network
+      - network_a
 
 volumes:
   mssql-data:
   nextcloud-data:
 
 networks:
-  company_network:
+  network_a:
     driver: bridge

@@ -10,6 +10,8 @@ services:
     restart: always             # run as a service
     volumes:
         - ./postgresql:/var/lib/postgresql/data
+    networks:
+      - network_b
 
   odoo15:
     image: odoo:15
@@ -32,4 +34,10 @@ services:
       - ./addons:/mnt/extra-addons
       - ./etc:/etc/odoo
     restart: always             # run as a service
+    networks:
+      - network_b
+
+networks:
+  network_b:
+    driver: bridge
     

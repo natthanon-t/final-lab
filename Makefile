@@ -1,12 +1,16 @@
 all: up
 
 up:
-	@docker-compose -f docker-compose.yml up -d --build
-	@docker-compose -f odoo-one/docker-compose.yml up -d --build
+	@docker-compose -f erp/docker-compose.yml up -d --build & \
+	docker-compose -f fileserver/docker-compose.yml up -d --build & \
+	docker-compose -f web/docker-compose.yml up -d --build & \
+	wait
 
 down:
-	@docker-compose down --volumes --remove-orphans
-	@docker-compose -f odoo-one/docker-compose.yml down --volumes --remove-orphans
+	@docker-compose -f erp/docker-compose.yml down --volumes --remove-orphans & \
+	docker-compose -f fileserver/docker-compose.yml down --volumes --remove-orphans & \
+	docker-compose -f web/docker-compose.yml down --volumes --remove-orphans & \
+	wait
 
 re: clean up
 
